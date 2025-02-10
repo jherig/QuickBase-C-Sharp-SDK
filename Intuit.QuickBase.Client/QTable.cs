@@ -489,8 +489,8 @@ namespace Intuit.QuickBase.Client
             if (!hasFileColumn && ((acnt + mcnt) > 0))  // if no file-type columns involved, use csv upload method for reducing API calls and speeding processing.
             {
                 List<String> csvLines = new List<string>(acnt + mcnt);
-                String colList = String.Join(".", KeyFID == -1 ? Columns.Where(col => (col.ColumnVirtual == false && col.ColumnLookup == false && col.ColumnSummary == false) || col.ColumnType == FieldType.recordid).Select(col => col.ColumnId.ToString())
-                                                             : Columns.Where(col => (col.ColumnVirtual == false && col.ColumnLookup == false && col.ColumnSummary == false) || col.ColumnId == KeyFID).Select(col => col.ColumnId.ToString()));
+                String colList = String.Join(".", KeyFID == -1 ? Columns.Where(col => (col.ColumnVirtual == false && col.ColumnLookup == false && col.ColumnSummary == false && string.IsNullOrEmpty(col.ColumnRole)) || col.ColumnType == FieldType.recordid).Select(col => col.ColumnId.ToString())
+                                                             : Columns.Where(col => (col.ColumnVirtual == false && col.ColumnLookup == false && col.ColumnSummary == false && string.IsNullOrEmpty(col.ColumnRole)) || col.ColumnId == KeyFID).Select(col => col.ColumnId.ToString()));
                 if (acnt > 0)
                 {
                     csvLines.AddRange(addRecs.Select(record => record.GetAsCSV(colList)));
@@ -581,6 +581,11 @@ namespace Intuit.QuickBase.Client
                 string label = columnNode.Element("label").Value;
                 bool hidden = columnNode.Element("appears_by_default")?.Value == "0";
                 bool canAddChoices = columnNode.Element("allow_new_choices")?.Value == "1";
+                string role = null;
+                if (columnNode.Attribute("role") != null)
+                {
+                    role = columnNode.Attribute("role").Value;
+                }
                 bool virt = false, lookup = false, summary = false;
                 if (columnNode.Attribute("mode") != null)
                 {
@@ -591,7 +596,7 @@ namespace Intuit.QuickBase.Client
                 }
 
                 bool allowHTML = columnNode.Element("allowHTML")?.Value == "1";
-                IQColumn col = ColumnFactory.CreateInstance(columnId, label, type, virt, lookup, summary, hidden, allowHTML, canAddChoices);
+                IQColumn col = ColumnFactory.CreateInstance(columnId, label, type, role, virt, lookup, summary, hidden, allowHTML, canAddChoices);
                 if (columnNode.Element("choices") != null)
                 {
                     foreach (XElement choicenode in columnNode.Element("choices").Elements("choice"))

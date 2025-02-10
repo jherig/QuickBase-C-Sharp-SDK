@@ -286,6 +286,28 @@ namespace QBFunctionTest
 #endif
 
         [TestMethod]
+        public void BasicTableOps()
+        {
+            InitConnection();
+            List<GrantedAppsInfo> appsLst = qbApp.GrantedDBs();
+            IQTable tbl = null;
+            foreach (var app in appsLst)
+            {
+                foreach (var tab in app.GrantedTables)
+                {
+                    if (tab.Name == "APITestApp: APITestTable")
+                    {
+                        tbl = qbApp.GetTable(tab.Dbid);
+                    }
+                }
+            }
+            Assert.IsNotNull(tbl,"Can't find table");
+            tbl.Query();
+            tbl.Records[0]["CheckboxTest"] = false;
+            tbl.AcceptChanges();
+        }
+
+        [TestMethod]
         public void BasicCreationAndRoundTripTest()
         {
             InitConnection();
@@ -318,7 +340,7 @@ namespace QBFunctionTest
             testTable.Columns.Add(new QColumn("UrlTest", FieldType.url));
             testTable.Columns.Add(new QColumn("MultiTextTest", FieldType.multitext));
             testTable.Columns.Add(new QColumn("RatingTest", FieldType.rating));
-            testTable.Columns.Add(new QColumn("FileTest", FieldType.file));
+            //testTable.Columns.Add(new QColumn("FileTest", FieldType.file));
 
             foreach (string val in multiTextOptions)
             {

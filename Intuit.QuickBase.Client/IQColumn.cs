@@ -18,6 +18,7 @@ namespace Intuit.QuickBase.Client
         int ColumnId { get; set; }
         string ColumnName { get; set; }
         FieldType ColumnType { get; set; }
+        string ColumnRole { get; set; }
         bool ColumnVirtual { get; set; }
         bool ColumnSummary { get; set; }
         bool IsHidden { get; set; }
