@@ -122,7 +122,7 @@ namespace Intuit.QuickBase.Client
                 case FieldType.multitext:
                     if (obj is string multiChoice)
                     {
-                        if (!CanAddChoices)
+                        if (!CanAddChoices && !inServer)
                         {
                             throw new InvalidChoiceException($"Column {ColumnName} does not allow adding new choices.");
                         }
@@ -130,7 +130,10 @@ namespace Intuit.QuickBase.Client
                         {
                             throw new InvalidChoiceException($"Column {ColumnName} presented with new choice that is longer than 60 characters");
                         }
-
+                        if (choices == null)
+                        {
+                            throw new InvalidChoiceException($"Column {ColumnName} presented with new choice when field not setup for choices");
+                        }
                         if (choices.Count > 100 && !inServer)
                         {
                             throw new InvalidChoiceException($"Column {ColumnName} presented with new choice that would bring total # of choices over 100");
